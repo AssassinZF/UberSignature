@@ -160,7 +160,22 @@
 {
     [super touchesMoved:touches withEvent:event];
     
+    //Cancel touch immediately after automatically over the artboard range
+    CGPoint touchPoint = [self.class _touchPointFromTouches:touches];
+    BOOL isContain = [self.view.layer containsPoint:touchPoint];
+    if (!isContain) {
+        [self.view touchesCancelled:touches withEvent:event];
+        return;
+    }
+
     [self _updateModelWithTouches:touches endContinuousLine:NO];
+}
+
+- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event{
+    [super touchesEnded:touches withEvent:event];
+    
+    [self.model asyncEndContinuousLine];
+    [self _updateViewFromModel];
 }
 
 #pragma mark - Private
